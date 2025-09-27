@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgriNix Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='homestyles.css') }}">
+</head>
+<body class="homie">
+
+  <!-- Custom Hamburger Button -->
+  <button id="hamburger" class="btn">
+    <span class="icon">
+        <svg viewBox="0 0 175 80" width="40" height="40">
+            <rect width="80" height="15" fill="#f0f0f0" rx="10"></rect>
+            <rect y="30" width="80" height="15" fill="#f0f0f0" rx="10"></rect>
+            <rect y="60" width="80" height="15" fill="#f0f0f0" rx="10"></rect>
+        </svg>
+    </span>
+    <span class="text">MENU</span>
+  </button>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <ul class="list">
+
+      <!-- Weather Report Button (working link) -->
+      <li class="sidebar-btn" onclick="closeSidebar()">
+        <a href="{{ url_for('weather') }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 16a4 4 0 0 0 0 8h13a4 4 0 1 0 0-8H5"></path>
+            <path d="M5 16a6 6 0 1 1 11.5-3"></path>
+          </svg>
+          <p class="label">Weather Report</p>
+        </a>
+      </li>
+
+      <!-- Inventory Button -->
+      <li class="sidebar-btn" onclick="closeSidebar()">
+        <a href="{{ url_for('inventory') }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6H4v12h16V6z"></path><path d="M9 6V4h6v2"></path>
+          </svg>
+          <p class="label">Inventory</p>
+        </a>
+      </li>
+
+      <!-- Commodity Price Button -->
+      <li class="sidebar-btn" onclick="closeSidebar()">
+        <a href="{{ url_for('commodity_prediction') }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"></path><path d="M7 9l5 5 5-5"></path>
+          </svg>
+          <p class="label">Commodity Price</p>
+        </a>
+      </li>
+
+      <!-- About Us Button -->
+      <li class="sidebar-btn" onclick="closeSidebar()">
+        <a href="#">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="#7e8590" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="8"></line>
+          </svg>
+          <p class="label">About Us</p>
+        </a>
+      </li>
+
+    </ul>
+  </div>
+
+  <div id="mainContent" class="home-page">
+    {% if session.role == 'farmer' %}
+      <div class="welcome-card">
+        <h1>Welcome Farmer {{ session.name }}! 🌾</h1>
+        <p>District: {{ session.district }}</p>
+        <p>Sub-District: {{ session.sub_district }}</p>
+        <p>Village: {{ session.village }}</p>
+      </div>
+    {% elif session.role == 'buyer' %}
+      <div class="welcome-card">
+        <h1>Welcome Buyer {{ session.name }}! 🛒</h1>
+      </div>
+    {% elif session.role == 'admin' %}
+      <div class="welcome-card">
+        <h1>Welcome Admin {{ session.admin_id }}! 👑</h1>
+      </div>
+    {% else %}
+      <div class="welcome-card">
+        <h1>Welcome to AgriNix!</h1>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

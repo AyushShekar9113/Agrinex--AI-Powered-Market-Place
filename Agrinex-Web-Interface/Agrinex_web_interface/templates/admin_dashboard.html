@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard | AgriNex</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      background-color: #f4f4f4;
+      height: 100vh;
+      overflow: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .dark-mode {
+      background-color: #1f1f1f;
+      color: #f0f0f0;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #2e8b57;
+      color: white;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      min-height: 100vh;
+      transition: background 0.3s;
+    }
+
+    .dark-mode .sidebar {
+      background-color: #1e5128;
+    }
+
+    .sidebar h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      padding: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #246944;
+    }
+
+    .main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .header {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dark-toggle {
+      background: white;
+      color: #2e8b57;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+      transition: transform 0.2s;
+    }
+
+    .dark-mode .card {
+      background-color: #2c2c2c;
+      color: white;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+
+    .card p {
+      color: #666;
+    }
+
+    .dark-mode .card p {
+      color: #ccc;
+    }
+
+    .btn {
+      margin-top: 1rem;
+      display: inline-block;
+      background-color: #2e8b57;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background-color: #246944;
+    }
+
+    canvas {
+      margin-top: 1rem;
+      max-width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      body {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>AgriNex Admin</h2>
+    <a href="#"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+    <a href="/admin/view-farmers"><i data-lucide="leaf"></i> View Farmers</a>
+    <a href="/admin/view-buyers"><i data-lucide="users"></i> View Buyers</a>
+    <a href="/admin/alerts"><i data-lucide="bell"></i> Alerts</a>
+    <a href="/admin/analytics"><i data-lucide="bar-chart-3"></i> Analytics</a>
+    <a href="/admin/sales"><i data-lucide="shopping-bag"></i> Sales</a>
+    <a href="#"><i data-lucide="file-text"></i> Reports</a>
+    <a href="/logout"><i data-lucide="log-out"></i> Logout</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <span>Welcome, {{ admin_name }} 👨‍🌾</span>
+      <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Toggle Mode</button>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>System Overview</h3>
+        <p>Monitor farmer uploads, buyer activity, and alerts in real-time.</p>
+      </div>
+
+      <div class="card">
+        <h3>Quick Actions</h3>
+        <a href="/admin/view-farmers" class="btn">Manage Farmers</a>
+        <a href="/admin/view-buyers" class="btn">Manage Buyers</a>
+      </div>
+
+      <div class="card">
+        <h3>Recent Alerts</h3>
+        <p>Stay updated with critical alerts and notifications.</p>
+        <a href="/admin/alerts" class="btn">View Alerts</a>
+      </div>
+
+      <div class="card">
+        <h3>System Users</h3>
+        <canvas id="userChart" width="200" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    lucide.createIcons();
+  
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+    }
+  
+    window.onload = function () {
+      if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark-mode");
+      }
+  
+      const ctx = document.getElementById("userChart").getContext("2d");
+  
+      const data = JSON.parse('{{ [farmer_count, buyer_count] | tojson | safe }}');
+  
+      new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Farmers", "Buyers"],
+          datasets: [{
+            data: data,
+            backgroundColor: ["#2e8b57", "#90ee90"],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "bottom"
+            }
+          }
+        }
+        
+      });
+    };
+    function loadEmergencyRequests() {
+    $.get('/api/emergency_requests', function(data) {
+        const tbody = $('#emergencyTable tbody');
+        tbody.empty();
+        data.forEach(req => {
+            tbody.append(`
+                <tr>
+                    <td>${req.request_id}</td>
+                    <td>${req.farmer_id}</td>
+                    <td>${req.issue}</td>
+                    <td>${req.location}</td>
+                    <td>${new Date(req.timestamp).toLocaleString()}</td>
+                    <td>${req.status}</td>
+                    <td>
+                        ${req.status === 'Pending' ? `
+                        <button class="resolveBtn" data-id="${req.request_id}">Resolve</button>` : '✅ Resolved'}
+                    </td>
+                </tr>
+            `);
+        });
+    });
+}
+
+$('#emergencyTable').on('click', '.resolveBtn', function() {
+    const id = $(this).data('id');
+    $.ajax({
+        url: `/api/emergency_requests/${id}`,
+        type: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify({ status: 'Resolved' }),
+        success: () => loadEmergencyRequests()
+    });
+});
+
+$(document).ready(() => {
+    loadEmergencyRequests();
+});
+
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,263 @@
+/* Reset Defaults */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body and HTML */
+html, body {
+  height: 100%;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+  background-image: url('./images/agrinix.png');
+  background-size: cover;
+  background-position: center;
+  transition: background-image 0.5s ease-in-out;
+}
+
+/* Hero Section */
+.hero {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  position: relative;
+}
+
+/* Glass Overlay */
+.glass-overlay {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 60px 40px;
+  max-width: 800px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Main Title */
+.main-title, .title-reflection {
+  font-size: 3rem;
+  font-weight: 800;
+  color: rgb(37, 28, 28);
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Special Ripple Title */
+.title-reflection {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  padding: 30px;
+  animation: ripple 8s infinite alternate ease-in-out;
+  margin-bottom: 1rem;
+}
+
+/* Ripple Animation */
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    border-radius: 60% 50% 70% 60% / 70% 60% 60% 50%;
+  }
+  100% {
+    transform: scale(1.01);
+    border-radius: 65% 55% 60% 65% / 65% 60% 65% 55%;
+  }
+}
+
+/* Description */
+.description, .description-reflection {
+  font-size: 1.3rem;
+  color: #06490b;
+  margin-top: 20px;
+  line-height: 1.6;
+}
+
+/* Special Reflection Description */
+.description-reflection {
+  background: rgba(255, 255, 255, 0.4);
+  color: #1a1a1a;
+  border-radius: 30px;
+  padding: 25px;
+  animation: ripple 10s infinite alternate ease-in-out;
+}
+
+/* Fade In Section */
+.fadein {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.fadein.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Scroll Section */
+.scroll-section {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  transition: background-image 0.5s ease-in-out;
+  position: relative;
+}
+
+/* Assistant Box */
+.assistant-box {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 40px;
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  text-align: center;
+}
+
+/* Login Wrapper */
+.login-wrapper {
+  width: 90%;
+  max-width: 450px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.login-wrapper.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Role Buttons */
+.hero-buttons, .role-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.role-buttons button, .role-button {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s, background-color 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Specific Role Colors */
+.farmer, .farmer-btn {
+  background-color: #4CAF50;
+}
+.farmer:hover, .farmer-btn:hover {
+  background-color: #388e3c;
+}
+
+.buyer, .buyer-btn {
+  background-color: #ff9800;
+}
+.buyer:hover, .buyer-btn:hover {
+  background-color: #ef6c00;
+}
+
+.admin, .admin-btn {
+  background-color: #2196F3;
+}
+.admin:hover, .admin-btn:hover {
+  background-color: #1976d2;
+}
+
+/* Login Section */
+.login-section {
+  display: none;
+  margin-top: 20px;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Inputs & Submit Button */
+input, button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+}
+
+input {
+  border: 1px solid #ccc;
+}
+
+button[type="submit"] {
+  background: #4CAF50;
+  color: white;
+  font-weight: bold;
+  border: none;
+  transition: background 0.2s ease;
+}
+
+button[type="submit"]:hover {
+  background: #388e3c;
+}
+
+/* Disclaimer */
+.disclaimer {
+  font-size: 0.85rem;
+  color: #a71919;
+  margin-top: 10px;
+}
+
+/* FadeIn Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Container for Inputs */
+.container {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+}
+
+/* Text Input */
+input[type="text"] {
+  width: 80%;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 1rem;
+}
+
+/* General Buttons */
+button {
+  padding: 0.6rem 1rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #357ABD;
+}
+
+/* Hidden Class */
+.hidden {
+  display: none;
+}

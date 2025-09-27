@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Emergency Alerts</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<audio id="alertSound" src="/static/alert.mp3" preload="auto"></audio>
+
+</head>
+<body>
+    <div class="container mt-5">
+    <h3>🚨 Emergency Requests</h3>
+    <table id="emergencyTable" class="table">
+        <thead>
+        <tr>
+            <th>Farmer ID</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Timestamp</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+    <tbody></tbody>
+    </table>
+</div>
+
+    <style>
+    .badge {
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: white;
+    }
+    .badge-danger {
+        background-color: #e74c3c;
+    }
+    .badge-success {
+        background-color: #2ecc71;
+    }
+</style>
+
+<script>
+    let previousIds = new Set();
+
+    function loadAlerts() {
+        $.get('/api/alerts/', function (data) {
+        const tbody = $('#emergencyTable tbody');
+        tbody.empty();
+
+        const currentIds = new Set();
+        let newAlertDetected = false;
+        data.forEach(item => {
+            currentIds.add(item._id);
+
+            if (!previousIds.has(item._id) && item.status === "Reported") {
+            newAlertDetected = true;
+        }
+
+        const row = `
+            <tr>
+                <td>${item.farmer_id}</td>
+                <td>${item.category}</td>
+                <td>${item.description}</td>
+                <td><span class="badge ${item.status === 'Reported' ? 'badge-danger' : 'badge-success'}">${item.status}</span></td>
+                <td>${new Date(item.timestamp).toLocaleString()}</td>
+                <td>
+                ${item.status === 'Reported'
+                    ? `<button class="resolve-btn btn btn-sm btn-primary" data-id="${item._id}">Mark as Resolved</button>`
+                    : ''}
+                </td>
+            </tr>
+            `;
+        tbody.append(row);
+        });
+
+        if (newAlertDetected) {
+          document.getElementById('alertSound').play();
+        }
+
+        previousIds = currentIds;
+      });
+    }
+
+    $(document).ready(function () {
+        loadAlerts();
+      setInterval(loadAlerts, 15000); // Refresh every 15 seconds
+
+    $('#emergencyTable').on('click', '.resolve-btn', function () {
+        const requestId = $(this).data('id');
+
+        $.ajax({
+            url: `/api/emergency_requests/${requestId}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ status: 'Resolved' }),
+            success: function () {
+            loadAlerts();
+        },
+        error: function (err) {
+            alert('Error updating status.');
+            console.error(err);
+        }
+        });
+      });
+    });
+</script>
+
+</body>
+</html>

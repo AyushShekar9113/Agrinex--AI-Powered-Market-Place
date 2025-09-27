@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commodity Price Prediction</title>
+    <style>
+        /* Set background image */
+        body {
+            background-image: url('{{ url_for('static', filename='images/prediction.jpg') }}'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            background-color: rgba(0, 0, 0, 0.5); /* Transparent black background */
+            border-radius: 10px;
+            padding: 20px;
+            animation: fadeIn 1.5s ease-in-out;
+            overflow-y: auto; /* Allows scrolling within the container */
+            max-height: 90vh;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        #prediction {
+            background-color: rgba(255, 255, 255, 0.9); /* White background for predictions */
+            color: #333; /* Dark text for better contrast */
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: slideIn 1s forwards 0.5s; /* Slide-in animation */
+            font-size: 1.1em;
+        }
+
+        #graph-section {
+            background-color: rgba(255, 255, 255, 0.7); /* Transparent white for graph */
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            opacity: 0;
+            animation: slideIn 1s forwards 1s; /* Slide-in animation for graph */
+            position: relative;
+        }
+
+        /* Loader styles from Uiverse.io */
+        .loader {
+            width: 80px;
+            height: 50px;
+            position: relative;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .loader-text {
+            position: absolute;
+            top: 0;
+            padding: 0;
+            margin: 0;
+            color: #26145b;
+            animation: text_713 3.5s ease both infinite;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .load {
+            background-color: #271168;
+            border-radius: 50px;
+            display: block;
+            height: 16px;
+            width: 16px;
+            bottom: 0;
+            position: absolute;
+            transform: translateX(64px);
+            animation: loading_713 3.5s ease both infinite;
+        }
+
+        .load::before {
+            position: absolute;
+            content: "";
+            width: 100%;
+            height: 100%;
+            background-color: #D1C2FF;
+            border-radius: inherit;
+            animation: loading2_713 3.5s ease both infinite;
+        }
+
+        @keyframes text_713 {
+            0% {
+                letter-spacing: 1px;
+                transform: translateX(0px);
+            }
+
+            40% {
+                letter-spacing: 2px;
+                transform: translateX(26px);
+            }
+
+            80% {
+                letter-spacing: 1px;
+                transform: translateX(32px);
+            }
+
+            90% {
+                letter-spacing: 2px;
+                transform: translateX(0px);
+            }
+
+            100% {
+                letter-spacing: 1px;
+                transform: translateX(0px);
+            }
+        }
+
+        @keyframes loading_713 {
+            0% {
+                width: 16px;
+                transform: translateX(0px);
+            }
+
+            40% {
+                width: 100%;
+                transform: translateX(0px);
+            }
+
+            80% {
+                width: 16px;
+                transform: translateX(64px);
+            }
+
+            90% {
+                width: 100%;
+                transform: translateX(0px);
+            }
+
+            100% {
+                width: 16px;
+                transform: translateX(0px);
+            }
+        }
+
+        @keyframes loading2_713 {
+            0% {
+                transform: translateX(0px);
+                width: 16px;
+            }
+
+            40% {
+                transform: translateX(0%);
+                width: 80%;
+            }
+
+            80% {
+                width: 100%;
+                transform: translateX(0px);
+            }
+
+            90% {
+                width: 80%;
+                transform: translateX(15px);
+            }
+
+            100% {
+                transform: translateX(0px);
+                width: 16px;
+            }
+        }
+
+        /* Animation for fading in */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Animation for sliding in from bottom */
+        @keyframes slideIn {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        select, input {
+            padding: 10px;
+            font-size: 1em;
+            width: 60%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        #commodityGraph {
+            width: 100%;
+            max-height: 250px;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1em;
+            color: #120c07;
+            text-align: center;
+            position: sticky;
+            top: 0; /* Keeps the disclaimer fixed at the top */
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Disclaimer Section -->
+        <div class="disclaimer">
+            <strong>Disclaimer:</strong> This prediction is based on 10 years of data from Karnataka only. <br>
+            Please note that some commodities do not have models for predictions, but past data graphs can still be provided.
+        </div>        
+
+        <h1>Commodity Price Prediction</h1>
+
+        <!-- Dropdown for selecting commodity -->
+        <div style="text-align: center;">
+            <select id="commodity">
+                <option value="" disabled selected>Select a Commodity</option>
+            </select>
+            <button onclick="getPrediction()">Get Prediction</button>
+            <button onclick="getGraph()">Get Graph</button>
+        </div>
+
+        <div id="prediction"></div>
+
+        <div id="graph-section">
+            <!-- Loader shown after clicking 'Get Graph' -->
+            <div class="loader" id="graph-loader" style="display: none;">
+                <span class="loader-text">loading</span>
+                <span class="load"></span>
+            </div>
+            <!-- Image will be displayed here -->
+            <img id="commodityGraph" src="" alt="Graph will be displayed here" style="max-width: 100%; display: none;">
+        </div>
+    </div>
+
+    <script>
+        // Fetch commodities from the backend and populate the dropdown
+        window.onload = function() {
+    const commodityDropdown = document.getElementById('commodity'); // <-- Correct id here
+
+    // Show a temporary loading option
+    const loadingOption = document.createElement('option');
+    loadingOption.textContent = 'Loading commodities...';
+    loadingOption.disabled = true;
+    loadingOption.selected = true;
+    commodityDropdown.appendChild(loadingOption);
+
+    fetch('/commodities', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Clear previous options (like "Loading...")
+        commodityDropdown.innerHTML = '';
+
+        if (data.commodities && data.commodities.length > 0) {
+            data.commodities.sort(); // optional: sort alphabetically
+
+            data.commodities.forEach(commodity => {
+                const option = document.createElement('option');
+                option.value = commodity;
+                option.textContent = commodity;
+                commodityDropdown.appendChild(option);
+            });
+
+            commodityDropdown.selectedIndex = 0; // Select first item automatically
+        } else {
+            const noDataOption = document.createElement('option');
+            noDataOption.textContent = 'No commodities available';
+            noDataOption.disabled = true;
+            commodityDropdown.appendChild(noDataOption);
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching commodities:', error);
+        commodityDropdown.innerHTML = '';
+
+        const errorOption = document.createElement('option');
+        errorOption.textContent = 'Error loading commodities';
+        errorOption.disabled = true;
+        commodityDropdown.appendChild(errorOption);
+    });
+};
+
+        // Function to get prediction
+        function getPrediction() {
+            const commodity = document.getElementById('commodity').value;
+            if (!commodity) {
+                alert('Please select a commodity!');
+                return;
+            }
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ commodity: commodity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('prediction').innerText = data.error;
+                } else {
+                    let prediction = "<h3>Price Predictions for Next 7 Days:</h3><ul>";
+                    data.prediction.forEach(item => {
+                        prediction += `<li>${item.ds}: ₹${item.yhat} (${item.yhat_per_quintal})</li>`;
+                    });
+                    prediction += "</ul>";
+                    document.getElementById('prediction').innerHTML = prediction;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Function to get graph
+        function getGraph() {
+            const commodity = document.getElementById('commodity').value;
+            if (!commodity) {
+                alert('Please select a commodity!');
+                return;
+            }
+
+            // Show loader while graph is being fetched
+            document.getElementById('graph-loader').style.display = 'block';
+            const graphImg = document.getElementById('commodityGraph');
+            graphImg.style.display = 'none'; // Hide image while loading
+            graphImg.src = `/graph?commodity=${commodity}`;
+
+            // Once the graph is loaded, hide loader and show image
+            graphImg.onload = function() {
+                document.getElementById('graph-loader').style.display = 'none';
+                graphImg.style.display = 'block';
+            };
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Report</title>
+    <link rel="stylesheet" href="/static/style.css"> <!-- Your main CSS file -->
+    <style>
+        body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: url('{{ url_for('static', filename='images/weather.jpg') }}') no-repeat center center fixed;
+        background-size: cover;
+        animation: fadeIn 2s ease-in;
+        }
+    
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    
+        .weather-container {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7); /* Glass effect */
+            margin: 40px auto;
+            border-radius: 15px;
+            max-width: 1000px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+    
+        .current-weather {
+            background-color: #e0f7fa;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        /* New split flex for current weather */
+        .current-weather-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .weather-left, .weather-right {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px;
+        }
+
+        .weather-left {
+            border-right: 2px solid rgba(0,0,0,0.1);
+        }
+
+        .weather-right {
+            text-align: left;
+        }
+
+        .weather-right h3 {
+            margin-bottom: 15px;
+        }
+    
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+    
+        .forecast-day {
+            background-color: #f1f8e9;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+    
+        .forecast-day:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>    
+</head>
+<body>
+
+<div class="weather-container">
+    <h1>Weather Report</h1>
+
+    <!-- Current Weather -->
+    <div class="current-weather">
+        <h2>Current Weather</h2>
+        <div class="current-weather-content">
+            
+            <!-- Left Half - Weather Details -->
+            <div class="weather-left">
+                <div class="weather-icon">☀️</div> <!-- Sun icon -->
+                <p><strong>Temperature:</strong> {{ current_weather.temperature }} °C</p>
+                <p><strong>Wind Speed:</strong> {{ current_weather.wind_speed }} km/h</p>
+                <p><strong>Precipitation (last 1 hour):</strong> {{ current_weather.precipitation }} mm</p>
+            </div>
+
+            <!-- Right Half - Location Info -->
+            <div class="weather-right">
+                <h3>📍 Location</h3>
+                <p><strong>Location:</strong> {{ location }}</p>
+            </div>            
+        </div>
+    </div>
+
+    <!-- 5-Day Forecast -->
+    <h2>5-Day Forecast</h2>
+    <div class="forecast-grid">
+        {% for date, day_data in forecast.items() %}
+            <div class="forecast-day">
+                <h3>{{ date }}</h3>
+                <p><strong>Avg. Temperature:</strong> {{ day_data.avg_temperature | round(2) }} °C</p>
+                <p><strong>Avg. Wind Speed:</strong> {{ day_data.avg_wind_speed | round(2) }} km/h</p>
+                <p><strong>Avg. Precipitation:</strong> {{ day_data.avg_precipitation | round(2) }} mm</p>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+</body>
+</html>

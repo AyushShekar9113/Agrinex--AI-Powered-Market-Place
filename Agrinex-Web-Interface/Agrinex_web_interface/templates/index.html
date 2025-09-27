@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AgriNex Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="index-page">
+  <!-- HERO SECTION -->
+  <div class="hero">
+    <div class="glass-overlay">
+      <h1 class="main-title">AgriNex</h1>
+      <p class="description">Empowering Farmers Through Voice, Technology & Market Access. Speak. Know. Grow.</p>
+    </div>
+  </div>
+
+  <!-- SCROLL SECTION WITH BUTTONS AND LOGIN -->
+  <div class="scroll-section" id="login-area">
+    <div class="login-wrapper" id="loginWrapper">
+
+      <!-- Farmer Voice Assistant box -->
+      <div class="assistant-box">
+        <h1>Farmer Voice Assistant</h1>
+
+        <div class="role-buttons">
+          <button onclick="selectRole('farmer')">Farmer</button>
+          <button onclick="selectRole('buyer')">Buyer</button>
+          <button onclick="selectRole('admin')">Admin</button>
+        </div>
+      </div>
+
+      <div id="farmer-section" class="login-section">
+        <h2>Farmer Login</h2>
+        <form id="farmerLoginForm">
+          <input type="text" name="farmer_id" placeholder="Farmer ID" required />
+          <button type="submit">Login</button>
+          <div id="farmerLoginMsg" style="margin-top: 10px;"></div> <!-- Add this to show message -->
+        </form>
+      </div>      
+      
+      <div id="buyer-section" class="login-section">
+        <h2>Buyer Login</h2>
+        <form id="buyerLoginForm" onsubmit="loginBuyer(event)">
+          <input type="text" name="buyer_id" placeholder="Buyer ID" required />
+          <button type="submit">Login</button>
+          <p id="buyerLoginMsg" style="color: red; margin-top: 10px;"></p>
+          <p>Don't have an account? <a href="#" onclick="showSignup()">Sign up</a></p>
+        </form>
+      </div>      
+      
+      <div id="buyer-signup-section" class="login-section">
+        <h2>Buyer Signup</h2>
+        <form id="buyerSignupForm">
+          <input type="text" name="username" placeholder="Username" required />
+          <input type="email" name="email" placeholder="Email" required />
+          <input type="tel" name="phone" placeholder="Phone Number" required />
+          <input type="text" name="district" placeholder="District" required />
+          <input type="text" name="sub_district" placeholder="Sub-District" required />
+          <input type="text" name="village" placeholder="Village" required />
+          <button type="submit">Sign Up</button>
+          <div id="buyerSignupMsg" style="margin-top: 10px;"></div> <!-- Add this for messages -->
+          <p class="disclaimer">For small shelf-life produce buyers.</p>
+          <p><a href="#" onclick="selectRole('buyer')">Back to login</a></p>
+        </form>
+      </div>            
+
+      <div id="admin-section" class="login-section">
+        <h2>Admin Login</h2>
+        <form id="adminLoginForm">
+          <label for="adminId">Admin ID:</label>
+          <input type="text" id="adminId" name="adminId" required>
+          
+          <label for="adminPassword">Password:</label>
+          <input type="password" id="adminPassword" name="adminPassword" required>
+          
+          <button type="submit">Login</button>
+      </form>
+        <p id="adminLoginMsg"></p> <!-- Display login result -->
+    </div>
+    
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

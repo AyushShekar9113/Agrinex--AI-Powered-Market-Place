@@ -1,0 +1,42 @@
+<!-- templates/inventory.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventory - AgriNix</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>🛒 Your Inventory</h1>
+
+    {% if sales %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Commodity</th>
+                <th>Quantity (kg)</th>
+                <th>Price per Kg (₹)</th>
+                <th>Total Price (₹)</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in sales %}
+            <tr>
+                <td>{{ sale.commodity }}</td>
+                <td>{{ sale.quantity_kg }}</td>
+                <td>{{ sale.price_per_kg }}</td>
+                <td>{{ sale.total_price }}</td>
+                <td>{{ sale.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No sales found.</p>
+    {% endif %}
+
+    <a href="/home">← Back to Home</a>
+</body>
+</html>

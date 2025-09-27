@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Buyers - AgriNex Admin</title>
+  <style>
+    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; }
+    th { background-color: #f2f2f2; }
+    input, button { margin: 5px; }
+  </style>
+</head>
+<body>
+
+  <h2>Buyers List</h2>
+  <input type="text" id="searchInput" oninput="filterTable()" placeholder="Search buyers..." style="margin-bottom: 10px; padding: 5px; width: 250px;">
+
+
+  <table>
+    <thead>
+      <tr>
+        <th>Buyer ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>District</th>
+        <th>Sub-District</th>
+        <th>Village</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="buyers-body"></tbody>
+  </table>
+
+  <!-- Edit Modal -->
+  <div id="editModal" style="display:none; border:1px solid #ccc; padding:20px; background:#eee;">
+    <h3>Edit Buyer</h3>
+    <input id="edit_username" placeholder="Username"><br>
+    <input id="edit_email" placeholder="Email"><br>
+    <input id="edit_phone" placeholder="Phone"><br>
+    <input id="edit_district" placeholder="District"><br>
+    <input id="edit_sub_district" placeholder="Sub-District"><br>
+    <input id="edit_village" placeholder="Village"><br>
+    <button onclick="submitEdit()">Save</button>
+    <button onclick="closeModal()">Cancel</button>
+  </div>
+  <input type="text" id="searchInput" oninput="filterTable()" placeholder="Search buyers..." style="margin-bottom: 10px; padding: 5px; width: 250px;">
+
+  <!-- Below the table -->
+  <div id="pagination" style="margin-top: 15px; text-align: center;">
+    <button onclick="prevPage()" id="prevBtn">Previous</button>
+    <span id="pageInfo" style="margin: 0 10px;">Page 1 of X</span>
+    <button onclick="nextPage()" id="nextBtn">Next</button>
+  </div>
+  
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+  
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+  
+    input[type="text"] {
+      padding: 10px;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+  
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+  
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+  
+    th {
+      background-color: #2e86de;
+      color: white;
+      position: sticky;
+      top: 0;
+    }
+  
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+  
+    button {
+      padding: 6px 12px;
+      margin: 2px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+  
+    button:hover {
+      opacity: 0.9;
+    }
+  
+    button:nth-child(1) {
+      background-color: #f1c40f;
+      color: white;
+    }
+  
+    button:nth-child(2) {
+      background-color: #e74c3c;
+      color: white;
+    }
+  
+    /* Edit Modal */
+    #editModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1000;
+      border-radius: 8px;
+      display: none;
+    }
+  
+    #editModal input {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  
+    #editModal button {
+      margin-top: 10px;
+      width: 48%;
+    }
+  </style>
+<script>
+    let buyersData = [];
+    let filteredData = [];
+    let currentEditId = null;
+    let currentPage = 1;
+    const rowsPerPage = 5;
+  
+    function loadBuyers() {
+      fetch('/api/buyers')
+        .then(res => res.json())
+        .then(data => {
+          buyersData = data.data;
+          filteredData = buyersData;
+          currentPage = 1;
+          renderTable();
+          updatePagination();
+        });
+    }
+  
+    function renderTable() {
+      const tbody = document.getElementById('buyers-body');
+      tbody.innerHTML = '';
+  
+      const start = (currentPage - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+      const paginated = filteredData.slice(start, end);
+  
+      paginated.forEach(buyer => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${buyer.buyer_id}</td>
+          <td>${buyer.username}</td>
+          <td>${buyer.email}</td>
+          <td>${buyer.phone}</td>
+          <td>${buyer.district}</td>
+          <td>${buyer.sub_district}</td>
+          <td>${buyer.village}</td>
+          <td>
+            <button onclick="openEditModal('${buyer.id}')">Edit</button>
+            <button onclick="deleteBuyer('${buyer.id}')">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+  
+    function filterTable() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      filteredData = buyersData.filter(buyer =>
+        buyer.username.toLowerCase().includes(input) ||
+        buyer.email.toLowerCase().includes(input) ||
+        buyer.district.toLowerCase().includes(input)
+      );
+      currentPage = 1;
+      renderTable();
+      updatePagination();
+    }
+  
+    function updatePagination() {
+      const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+      document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById('prevBtn').disabled = currentPage === 1;
+      document.getElementById('nextBtn').disabled = currentPage === totalPages;
+    }
+  
+    function nextPage() {
+      const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+        updatePagination();
+      }
+    }
+  
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+        updatePagination();
+      }
+    }
+  
+    function openEditModal(id) {
+      const buyer = buyersData.find(b => b.id === id);
+      if (!buyer) return;
+  
+      currentEditId = id;
+      document.getElementById('edit_username').value = buyer.username;
+      document.getElementById('edit_email').value = buyer.email;
+      document.getElementById('edit_phone').value = buyer.phone;
+      document.getElementById('edit_district').value = buyer.district;
+      document.getElementById('edit_sub_district').value = buyer.sub_district;
+      document.getElementById('edit_village').value = buyer.village;
+      document.getElementById('editModal').style.display = 'block';
+    }
+  
+    function closeModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+  
+    function submitEdit() {
+      const updated = {
+        username: document.getElementById('edit_username').value,
+        email: document.getElementById('edit_email').value,
+        phone: document.getElementById('edit_phone').value,
+        district: document.getElementById('edit_district').value,
+        sub_district: document.getElementById('edit_sub_district').value,
+        village: document.getElementById('edit_village').value
+      };
+  
+      fetch(`/api/buyers/${currentEditId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      }).then(res => {
+        if (res.ok) {
+          closeModal();
+          loadBuyers();
+        }
+      });
+    }
+  
+    function deleteBuyer(id) {
+      if (!confirm("Are you sure to delete?")) return;
+  
+      fetch(`/api/buyers/${id}`, {
+        method: 'DELETE'
+      }).then(res => {
+        if (res.ok) {
+          loadBuyers();
+        }
+      });
+    }
+  
+    // Initial load
+    loadBuyers();
+  </script>
+  
+</body>
+</html>
