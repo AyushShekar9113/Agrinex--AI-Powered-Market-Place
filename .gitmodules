@@ -1,0 +1,3 @@
+[submodule "Agrinex-Agent"]
+	path = Agrinex-Agent
+	url = https://github.com/AyushShekar9113/agrinex-web-bot
