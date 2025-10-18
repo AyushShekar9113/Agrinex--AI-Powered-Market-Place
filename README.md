@@ -32,4 +32,4 @@ Folder: [Agrinex-Web-Interface](./Agrinex-Web-Interface)
 
 ### Clone the repository (with submodules)
 ```bash
-git clone --recurse-submodules https://github.com/your-username/Agrinex--AI-Powered-Market-Place.git
+git clone --recurse-submodules https://github.com/AyushShekar9113/Agrinex--AI-Powered-Market-Place.git
